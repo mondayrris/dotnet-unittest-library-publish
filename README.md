@@ -1,52 +1,74 @@
-# Class Library Projects UnitTest 
+# Class Library Projects UnitTest Publish
 
-> [Reference Link Here](https://learn.microsoft.com/en-us/dotnet/core/tutorials/testing-library-with-visual-studio-mac)
+This quickstart shows you how to quickly create a NuGet package from a .NET class LIBRARY and publish it to nuget.org by using the .NET command-line interface, or dotnet CLI.
 
-## Create a unit test project
+> [Reference Link Here](https://learn.microsoft.com/en-us/nuget/quickstart/create-and-publish-a-package-using-the-dotnet-cli)
 
-- Open the ClassLibraryProjects solution you created in Create a .NET class library using Visual Studio for Mac.
-- In the Solution pad, ctrl-click the ClassLibraryProjects solution and select Add > New Project.
-- In the New Project dialog, select Tests from the Web and Console node. Select the MSTest Project followed by Next.
-- Name the new project "StringLibraryTest" and select Create.
+## Add package metadata to the project file
 
-## Add a project reference
+Every NuGet package has a manifest that describes the package's contents and dependencies. In the final package, the manifest is a .nuspec file, which uses the NuGet metadata properties you include in the project file.
 
-For the test project to work with the StringLibrary class, add a reference to the StringLibrary project.
-- In the Solution pad, ctrl-click Dependencies under StringLibraryTest. Select Add Reference from the context menu.
-- In the References dialog, select the StringLibrary project. Select OK.
+Open the .csproj, .fproj, or .vbproj project file, and add the following properties inside the existing <PropertyGroup> tag. Use your own values for name and company, and replace the package identifier with a unique value.
 
-## Run UnitTest
+```
+<PackageId>Contoso.08.28.22.001.Test</PackageId>
+<Version>1.0.0</Version>
+<Authors>your_name</Authors>
+<Company>your_company</Company>
+```
 
-- Open the Unit Tests panel on the right side of the screen. Select View > Tests from the menu.
-- Click the Pin icon to keep the panel open.
-- Click the Run All button.
+> The package identifier must be unique across nuget.org and other package sources. Publishing makes the package publicly visible, so if you use the example AppLogger library or other test library, use a unique name that includes Sample or Test. For packages you build for public consumption, pay special attention to the PackageTags property. Tags help others find your package and understand what it does.
 
-## Handle test failures
+You can add any optional properties described in [NuGet metadata properties](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#nuget-metadata-properties).
 
-If you're doing `test-driven development (TDD)`, you write tests first and they fail the first time you run them. Then you add code to the app that makes the test succeed. 
+## Run the pack command
 
-For this tutorial, you created the test after writing the app code that it validates, so you haven't seen the test fail. To validate that a test fails when you expect it to fail, add an invalid value to the test input.
+To build a NuGet package or .nupkg file from the project, run the `dotnet pack` command, which also builds the project automatically.
 
-## Test the Release version of the library
+## Automatically generate package on build
 
-Now that the tests have all passed when running the Debug build of the library, 
-run the tests an additional time against the Release build of the library. 
-A number of factors, including compiler optimizations, can sometimes produce different behavior between Debug and Release builds.
+To automatically run dotnet pack whenever you run dotnet build, add the following line to your project file within <PropertyGroup>:
 
-To test the Release build:
+```
+<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+```
 
-- In the Visual Studio toolbar, change the build configuration from Debug to Release.
-- In the Solution pad, ctrl-click the StringLibrary project and select Build from the context menu to recompile the library.
-- Run the unit tests again.
+## Publish the package
 
-## Debug tests
+Publish your .nupkg file to nuget.org by using the dotnet nuget push command with an API key you get from nuget.org.
 
-If you're using Visual Studio for Mac as your IDE, you can use the same process shown in Tutorial: [Debug a .NET console application using Visual Studio for Mac](https://learn.microsoft.com/en-us/dotnet/core/tutorials/debugging-with-visual-studio-mac) to debug code using your unit test project. 
+Make sure to copy your new API key now using the Copy button below. You will not be able to do so.
 
-Instead of starting the ShowCase app project, ctrl-click the StringLibraryTests project, and select Start Debugging Project from the context menu.
-Visual Studio starts the test project with the debugger attached. Execution will stop at any breakpoint you've added to the test project or the underlying library code.
+- Get your API key
+    - [Sign into your nuget.org account](https://www.nuget.org/users/account/LogOn?returnUrl=%2F) or [create an account]() if you don't have one already.
+    - Select your user name at upper right, and then select API Keys.
+    - Select Create, and provide a name for your key.
+    - Under Select Scopes, select Push.
+    - Under Select Packages > Glob Pattern, enter *.
+    - Select Create.
+    - Select Copy to copy the new key.
+- Copy the content to new created file `nuget-apikey`
+- Add this filename to gitignore
 
-## Additional resources
+## Publish with dotnet nuget push
 
-- [Unit testing in .NET](https://learn.microsoft.com/en-us/dotnet/core/testing/)
+From the folder that contains the .nupkg file, run the following command. Specify your .nupkg filename, and replace the key value with your API key.
 
+```bash
+cd StringLibrary/bin/Release
+dotnet nuget push Mondayrris.09.25.22.001.StringLibrary.1.0.0.nupkg --api-key content_from_nuget_apikey --source https://api.nuget.org/v3/index.json
+```
+
+Verify the success result, which contains the text `Your package was pushed`. Check [here](https://learn.microsoft.com/en-us/nuget/quickstart/create-and-publish-a-package-using-the-dotnet-cli#publish-errors) for publish errors.
+
+## Manage the published package
+
+When your package successfully publishes, you receive a confirmation email. To see the package you just published, on nuget.org, select your user name at upper right, and then select Manage Packages.
+
+## Make your uploaded package not searchable
+
+if you decide you don't want the package to be visible, you can unlist the package to hide it from search results:
+
+- After the package appears under Published Packages on the Manage Packages page, select the pencil icon next to the package listing.
+
+- On the next page, select Listing, deselect the List in search results checkbox, and then select Save.
